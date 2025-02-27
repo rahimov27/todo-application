@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_application/todo_viewmodel.dart';
+import 'package:todo_application/widgets/app_background_widget.dart';
+import 'package:todo_application/widgets/app_dialog_widget.dart';
+import 'package:todo_application/widgets/finished_list_tile_w_idget.dart';
+import 'package:todo_application/widgets/no_todo_text_w_idget.dart';
+import 'package:todo_application/widgets/un_finished_list_tile_widget.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -11,60 +16,63 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final todoController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final todoModel = Provider.of<TodoViewmodel>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 400,
-              child:
-                  todoModel.todos.isEmpty
-                      ? const Center(child: Text("No todos"))
-                      : ListView.builder(
+      body: Stack(
+        children: [
+          AppBackgroundWidget(),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                todoModel.todos.isEmpty
+                    ? NoTodoTextWidget()
+                    : Expanded(
+                      child: ListView.builder(
                         itemCount: todoModel.todos.length,
                         itemBuilder: (context, index) {
                           final todo = todoModel.todos[index];
                           return Row(
                             children: [
                               SizedBox(
-                                width: 150,
+                                width: MediaQuery.of(context).size.width * 0.60,
                                 child:
                                     todo.isFinished
-                                        ? ListTile(
-                                          title: Text(
-                                            todo.name,
-                                            style: TextStyle(
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                        )
-                                        : ListTile(title: Text(todo.name)),
+                                        ? FinishedListTileWidget(todo: todo)
+                                        : UnFinishedListTileWidget(todo: todo),
                               ),
                               Spacer(),
                               Checkbox(
+                                activeColor: Colors.black,
+                                checkColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(3),
                                 ),
                                 value: todo.isFinished,
-                                onChanged: (value) {
+                                onChanged: (value) async {
                                   todoModel.toggle(index);
+                                  await Future.delayed(
+                                    Duration(seconds: 4),
+                                    () {
+                                      todoModel.removeTodo(todo);
+                                    },
+                                  );
                                 },
                               ),
                             ],
                           );
                         },
                       ),
+                    ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
@@ -72,35 +80,7 @@ class _AppState extends State<App> {
           showDialog(
             context: context,
             builder:
-                (context) => AlertDialog(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 300,
-                        child: TextField(controller: todoController),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          if (todoController.text.trim().isNotEmpty) {
-                            Provider.of<TodoViewmodel>(
-                              context,
-                              listen: false,
-                            ).addTodo(
-                              todoController.text,
-                              false,
-                              DateTime.now(),
-                              "status",
-                            );
-                          }
-                          todoController.clear();
-                          Navigator.pop(context);
-                        },
-                        child: Text("add todo"),
-                      ),
-                    ],
-                  ),
-                ),
+                (context) => AppDialogWidget(todoController: todoController),
           );
         },
         shape: CircleBorder(),

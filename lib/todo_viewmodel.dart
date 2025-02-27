@@ -47,4 +47,11 @@ class TodoViewmodel extends ChangeNotifier {
       notifyListeners(); // Обновляем UI после загрузки
     }
   }
+
+  // remove todo from list
+  void removeTodo(TodoModel model) {
+    todos.remove(model);
+    saveTodos();
+    notifyListeners();
+  }
 }
