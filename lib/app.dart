@@ -21,6 +21,8 @@ class _AppState extends State<App> {
   List<String> backgroudImages = [
     "assets/wallpaper.jpg",
     "assets/wallpaper-2.jpg",
+    "assets/wallpaper-3.jpg",
+    "assets/wallpaper-4.jpg",
   ];
 
   String backgroundImage = "assets/wallpaper.jpg";
@@ -109,7 +111,7 @@ class _AppState extends State<App> {
       floatingActionButton: SpeedDial(
         overlayColor: Colors.black,
         shape: CircleBorder(),
-        overlayOpacity: 0.4,
+        overlayOpacity: 0,
         animatedIcon: AnimatedIcons.menu_close,
         backgroundColor: Colors.white,
         spacing: 10,
@@ -132,11 +134,14 @@ class _AppState extends State<App> {
             onTap:
                 () => showModalBottomSheet(
                   context: context,
+                  sheetAnimationStyle: AnimationStyle(curve: Curves.easeIn),
+                  isScrollControlled: true,
+                  backgroundColor: Colors.white,
+                  useSafeArea: true,
                   builder:
-                      (_) => Container(
+                      (_) => SizedBox(
                         height: 300,
                         width: double.infinity,
-                        color: Colors.red,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Row(
