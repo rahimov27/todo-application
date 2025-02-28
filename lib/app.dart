@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_application/todo_viewmodel.dart';
 import 'package:todo_application/widgets/app_background_widget.dart';
 import 'package:todo_application/widgets/app_dialog_widget.dart';
@@ -16,6 +18,36 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final todoController = TextEditingController();
+  List<String> backgroudImages = [
+    "assets/wallpaper.jpg",
+    "assets/wallpaper-2.jpg",
+  ];
+
+  String backgroundImage = "assets/wallpaper.jpg";
+
+  Future<void> setBackgroundImage(String imagePath) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("wallpaper", imagePath);
+    setState(() {
+      backgroundImage = imagePath;
+    });
+  }
+
+  Future<void> loadBackgroundImage() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final savedImage = await prefs.getString("wallpaper");
+    if (savedImage != null) {
+      setState(() {
+        backgroundImage = savedImage;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadBackgroundImage();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +57,7 @@ class _AppState extends State<App> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          AppBackgroundWidget(),
+          AppBackgroundWidget(image: backgroundImage),
           SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -74,17 +106,68 @@ class _AppState extends State<App> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder:
-                (context) => AppDialogWidget(todoController: todoController),
-          );
-        },
+      floatingActionButton: SpeedDial(
+        overlayColor: Colors.black,
         shape: CircleBorder(),
-        child: Icon(Icons.add),
+        overlayOpacity: 0.4,
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.white,
+        spacing: 10,
+        spaceBetweenChildren: 5,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.add),
+            shape: CircleBorder(),
+            onTap:
+                () => showDialog(
+                  context: context,
+                  builder:
+                      (context) =>
+                          AppDialogWidget(todoController: todoController),
+                ),
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.wallpaper),
+            shape: CircleBorder(),
+            onTap:
+                () => showModalBottomSheet(
+                  context: context,
+                  builder:
+                      (_) => Container(
+                        height: 300,
+                        width: double.infinity,
+                        color: Colors.red,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children:
+                                backgroudImages.map((image) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      setBackgroundImage(image);
+                                      Navigator.pop(context);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.asset(
+                                          image,
+                                          fit: BoxFit.cover,
+                                          height: 60,
+                                          width: 60,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                          ),
+                        ),
+                      ),
+                ),
+          ),
+        ],
       ),
     );
   }

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AppBackgroundWidget extends StatelessWidget {
-  const AppBackgroundWidget({super.key});
+  final String image;
+  const AppBackgroundWidget({super.key,required this.image});
 
   @override
   Widget build(BuildContext context) {
     return Positioned.fill(
       child: SizedBox(
         height: double.infinity,
-        child: Image.asset("assets/wallpaper.jpg", fit: BoxFit.cover),
+        child: Image.asset(image, fit: BoxFit.cover),
       ),
     );
   }
