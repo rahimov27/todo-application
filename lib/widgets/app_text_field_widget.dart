@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTextFieldWidget extends StatelessWidget {
-  const AppTextFieldWidget({
-    super.key,
-    required this.todoController,
-  });
+  const AppTextFieldWidget({super.key, required this.todoController});
 
   final TextEditingController todoController;
 

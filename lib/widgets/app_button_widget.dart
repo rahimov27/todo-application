@@ -4,9 +4,16 @@ import 'package:todo_application/app_colors.dart';
 import 'package:todo_application/todo_viewmodel.dart';
 
 class AppButtonWidget extends StatelessWidget {
-  const AppButtonWidget({super.key, required this.todoController});
+  const AppButtonWidget({
+    super.key,
+    required this.todoController,
+    required this.selectedTime,
+    required this.isMain,
+  });
 
   final TextEditingController todoController;
+  final DateTime selectedTime;
+  final bool isMain;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,7 @@ class AppButtonWidget extends StatelessWidget {
           Provider.of<TodoViewmodel>(
             context,
             listen: false,
-          ).addTodo(todoController.text, false, DateTime.now(), "status");
+          ).addTodo(todoController.text, false, selectedTime, "status");
         }
         todoController.clear();
         Navigator.pop(context);

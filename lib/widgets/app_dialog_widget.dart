@@ -15,10 +15,11 @@ class AppDialogWidget extends StatefulWidget {
 }
 
 class _AppDialogWidgetState extends State<AppDialogWidget> {
-  DateTime date = DateTime.now();
+  DateTime selectedDate = DateTime.now();
+  bool isMain = false;
   @override
   Widget build(BuildContext context) {
-    DateFormat('dd.MM-HH:mm').format(date);
+    DateFormat('dd.MM-HH:mm').format(selectedDate);
     return AlertDialog(
       contentPadding: EdgeInsets.all(0),
       iconPadding: EdgeInsets.all(0),
@@ -34,7 +35,7 @@ class _AppDialogWidgetState extends State<AppDialogWidget> {
               AppTextFieldWidget(todoController: widget.todoController),
               SizedBox(height: 10),
               GestureDetector(
-                child: Text(formatedDate(date)),
+                child: Text(formatedDate(selectedDate)),
                 onTap: () {
                   showCupertinoModalPopup(
                     context: context,
@@ -47,7 +48,7 @@ class _AppDialogWidgetState extends State<AppDialogWidget> {
                             mode: CupertinoDatePickerMode.dateAndTime,
                             onDateTimeChanged: (value) {
                               setState(() {
-                                date = value;
+                                selectedDate = value;
                               });
                             },
                           ),
@@ -55,12 +56,37 @@ class _AppDialogWidgetState extends State<AppDialogWidget> {
                   );
                 },
               ),
-
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Важно?",
+                    style: TextStyle(
+                      fontFamily: "Gilroy",
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  CupertinoSwitch(
+                    value: isMain,
+                    onChanged: (value) {
+                      setState(() {
+                        isMain = !isMain;
+                        print(isMain);
+                      });
+                    },
+                  ),
+                ],
+              ),
               SizedBox(height: 30),
-
               Align(
                 alignment: Alignment.center,
-                child: AppButtonWidget(todoController: widget.todoController),
+                child: AppButtonWidget(
+                  todoController: widget.todoController,
+                  selectedTime: selectedDate,
+                  isMain: isMain,
+                ),
               ),
             ],
           ),
